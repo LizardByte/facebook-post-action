@@ -1,12 +1,19 @@
 ---
 name: CI
+permissions:
+  contents: read
 
 on:
   pull_request:
-    branches: [master]
-    types: [opened, synchronize, reopened]
+    branches:
+      - master
+    types:
+      - opened
+      - synchronize
+      - reopened
   push:
-    branches: [master]
+    branches:
+      - master
   workflow_dispatch:
 
 concurrency:
@@ -23,7 +30,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: '3.12'
 
       - name: Install Python Dependencies
         run: |
@@ -65,8 +72,7 @@ jobs:
         with:
           access_token: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
           fail_on_error: true
-          message: |
-            ${{ github.event.repository.name }} - ${{ github.ref_name }} test
+          message: ${{ github.event.repository.name }} - ${{ github.ref_name }} test
           page_id: ${{ secrets.FACEBOOK_PAGE_ID }}
           url: ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}
 
@@ -75,6 +81,8 @@ jobs:
     needs:
       - pytest
       - action
+    permissions:
+      contents: write  # needed for setup-release-action
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
